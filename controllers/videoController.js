@@ -38,7 +38,7 @@ async function getVideo(req, res){
         }
         const videoFilePath = video.filePath;
         //stream
-        res.setHeader('Content-Type', 'video/*');
+        res.setHeader('Content-Type', 'video/mp4');
 
         // Set cache control headers to prevent caching
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
