@@ -7,7 +7,12 @@ const videoSchema = new mongoose.Schema({
       },
   filePath:{type:String,
             required: true
-      } 
+      } ,
+   filename:{
+         type:String,
+         required:true
+
+   } 
 },
 {
     timestamps: true
