@@ -21,7 +21,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swagger));
 app.use('/api/videos', videoRoute);
 app.use(
   cors({
-    origin: ["http://127.0.0.1:4000", "http://localhost:4000", "*"],
+    origin: ["http://127.0.0.1:3000", "http://localhost:3000", "*"],
     credentials: true,
   })
 );
