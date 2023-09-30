@@ -4,6 +4,8 @@ const videoRoute = require('./routes/videoRoute');
 const dotenv = require('dotenv')
 const swaggerUi = require('swagger-ui-express');
 const swagger= require('./documentation/swagger'); // Import your Swagger file
+const cors = require('cors');
+
 
 dotenv.config()
 const app = express();
@@ -17,7 +19,12 @@ app.use(express.json());
 app.use(express.static('uploads'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swagger));
 app.use('/api/videos', videoRoute);
-
+app.use(
+  cors({
+    origin: ["http://127.0.0.1:4000", "http://localhost:4000", "*"],
+    credentials: true,
+  })
+);
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
