@@ -4,16 +4,16 @@ const fs = require('fs');
 
 // Controller function to handle video upload
 async function uploadVideo(req, res) {
-    const videoPath = req.file.path;
-    const uniqueFilename = req.file.filename; 
-
+    
     try {
-     if (!videoPath) {
+     if (!req.file) {
         return res.status(404).json({
             message: "No file uploaded"
         })
         
      }
+    const videoPath = req.file.path
+    const uniqueFilename = req.file.filename; 
     const newVideo = new Video({
       title: req.body.title,
       filePath: videoPath,
