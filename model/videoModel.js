@@ -11,8 +11,8 @@ const videoSchema = new mongoose.Schema({
    filename:{
          type:String,
          required:true
-
-   } 
+   } ,
+   transcript: { type: String, required: false },
 },
 {
     timestamps: true

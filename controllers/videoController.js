@@ -4,34 +4,38 @@ const fs = require('fs');
 
 // Controller function to handle video upload
 async function uploadVideo(req, res) {
-    
     try {
-     if (!req.file) {
+      if (!req.file) {
         return res.status(404).json({
-            message: "No file uploaded"
-        })
-        
-     }
-    const videoPath = req.file.path
-    const uniqueFilename = req.file.filename; 
-    const newVideo = new Video({
-      title: req.body.title,
-      filePath: videoPath,
-      filename: uniqueFilename
-   
-    });
-
-    await newVideo.save();
-
-    res.status(200).json({ 
-    message: 'Video uploaded successfully',
-    videoId: newVideo._id,
-    filename: uniqueFilename, });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error uploading video' });
+          message: "No file uploaded"
+        });
+      }
+  
+      const videoPath = req.file.path;
+      const uniqueFilename = req.file.filename; 
+      const newVideo = new Video({
+        title: req.body.title,
+        filePath: videoPath,
+        filename: uniqueFilename
+      });
+  
+      await newVideo.save();
+  
+      // Log the file path to the terminal
+      console.log("Before logging file path");
+      console.log("File path:", videoPath);
+  
+      res.status(200).json({ 
+        message: 'Video uploaded successfully',
+        videoId: newVideo._id,
+        filename: uniqueFilename,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error uploading video' });
+    }
   }
-}
+  
 
 async function getVideoById(req, res){
     try {
@@ -50,6 +54,7 @@ async function getVideoById(req, res){
             }) 
         }
         const videoFilePath = video.filePath;
+        
         //stream
         res.setHeader('Content-Type', 'video/mp4');
         
