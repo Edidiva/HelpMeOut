@@ -19,12 +19,7 @@ app.use(express.json());
 app.use(express.static('uploads'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swagger));
 app.use('/api/videos', videoRoute);
-app.use(
-  cors({
-    origin: ["http://127.0.0.1:3000", "http://localhost:3000", "*"],
-    credentials: true,
-  })
-);
+app.use(cors());
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
