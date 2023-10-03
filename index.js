@@ -4,13 +4,15 @@ const videoRoute = require('./routes/videoRoute');
 const videosRoute = require('./routes/routes');
 const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger.json'); 
+const swaggerFile = require('./documentation/swagger.js'); 
 const cors = require('cors');
-const { startAgenda } = require('./agenda');
-
+const yaml = require('yaml');
+const bodyParser = require('body-parser')
 dotenv.config();
 const app = express();
+const path = require("path");
 const port = process.env.PORT || 3000;
+const swaggerDocument = yaml.parse(swaggerFile, 'utf8')
 
 // Connecting to MongoDB
 mongoose
@@ -19,8 +21,16 @@ mongoose
   .catch((error) => console.log(error.message));
 
 // Middleware for JSON parsing and serving static files
-app.use(express.json());
-app.use(express.static('uploads'));
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(
+  "/storage",
+  express.static(path.join(__dirname, "videos_uploads"))
+);
+// app.use(
+//   "/media/files",
+  
+// );
+
 app.use(
   cors({
     origin: ['http://127.0.0.1:3000', 'http://localhost:3000', '*'],
@@ -33,12 +43,16 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Routes
 app.use('/api/videos', videoRoute);
-app.use('/api/video', videosRoute);
+app.use('/api', videosRoute);
+app.use("*", (req, res) => {
+  res.status(404).json({
+    msg: "route not found",
+  });
+});
 
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-// Start the Agenda job processing
-startAgenda();
+

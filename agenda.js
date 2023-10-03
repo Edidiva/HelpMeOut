@@ -1,37 +1,46 @@
 // agenda.js
 const Agenda = require('agenda');
-const { appendChunksToFile } = require('./controllers/fileOperations');
+const { ProcessingVideos } = require('./controllers/video');
 const dotenv = require('dotenv');
+
 dotenv.config();
 
-const agenda = new Agenda({ db: { address: process.env.MONGODB_CONNECTION_URL } });
-
-agenda.on('ready', () => {
-  agenda.define('processVideoChunks', async job => {
-    const { videoChunks, videoFileName } = job.attrs.data;
-
-    appendChunksToFile(videoFileName, videoChunks);
-
-    if (job.attrs.data.isFinalChunk) {
-      // Perform additional processing for the final chunk
-      console.log('All chunks received. Start transcription or other processing.');
-    }
-  });
+const agenda = new Agenda({
+  db: {
+    address: process.env.MONGODB_CONNECTION_URL,
+  },
 });
 
-function startAgenda() {
-  agenda.start();
-  console.log('Agenda is processing jobs');
-}
+agenda.define(
+  'process_video',
+  { concurrency: 10, priority: 'high' },
+  async (job) => {
+    try {
+      const { Id } = job.attrs.data;
+      await ProcessingVideos( Id);
+    } catch (error) {
+      console.error(error);
+      console.error(`Error processing recorded video. ${error.message}`);
+    }
+  }
+);
 
-async function scheduleVideoProcessingJob(videoChunk, isFinalChunk) {
-  const jobData = {
-    videoChunks: [videoChunk],
-    videoFileName: 'video.mp4',
-    isFinalChunk,
-  };
+const processVideos = async (Id) => {
+  try {
+    await agenda.start();
+    await agenda.now('process_video', {
+      Id,
+    });
+    console.log('\nVIDEO PROCESSING IN BG. \n');
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-  await agenda.schedule('in 1 second', 'processVideoChunks', jobData);
-}
+agenda.on('start', (job) => {
+  console.log(`Job ${job.attrs.name} starting`);
+});
 
-module.exports = { startAgenda, scheduleVideoProcessingJob };
+module.exports = {
+  processVideos,
+};
