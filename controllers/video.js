@@ -3,14 +3,14 @@ const fs = require("fs");
 const path = require("path");
 const VideoModel = require("../model/newVideoModel");
 
-async function transcribeAudio(audioOutput, Id) {
+async function transcribeAudio(audioInput, Id) {
   try {
-    if (!fs.existsSync(audioOutput)) {
-      console.log(`Audio output ${audioOutput} notfound`);
+    if (!fs.existsSync(audioInput)) {
+      console.log(`Audio input ${audioInput} notfound`);
       return;
     }
     const transcript = await openai.audio.transcriptions.create({
-      file: fs.createReadStream(audioOutput),
+      file: fs.createReadStream(audioInput),
       model: "whisper-1",
     });
 
@@ -22,8 +22,7 @@ async function transcribeAudio(audioOutput, Id) {
     if (videoExists) {
       const filter = { videoId: Id };
       const update = { transcript: transcript?.text };
-      await Video.findOneAndUpdate(filter, update);
-
+      await VideoModel.findOneAndUpdate(filter, update);
       console.log("Transcribing done. \n");
     } else {
       console.log("Failed updating transcript, Video dont exists.");

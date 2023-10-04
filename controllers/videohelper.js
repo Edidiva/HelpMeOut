@@ -94,25 +94,10 @@ async function getVideoById(req, res) {
       videoId: videoId,
     });
 
+    console.log(videoExists);
+
     if (!videoExists) {
       return res.status(404).json({ message: "Video not found." });
-    }
-
-    const videoPath = path.join(
-      __dirname,
-      "..",
-      "video_uploads",
-      `${videoId}.webm`
-    );
-
-    // check if this video exist on server
-    if (!fs.existsSync(videoPath)) {
-      res.status(404).json({ message: "Video no longer exists on server" });
-
-      // delete from DB
-      await VideoModel.deleteOne({ videoId: videoId });
-      
-      return;
     }
 
     res.status(200).json({
@@ -138,7 +123,7 @@ const getAllVideos = async (req, res) => {
 
     const updated = allVideos?.map((video) => ({
       videoId: video?.videoId,
-      video: `${process.env.API_URL}/media/files${video?.videoId}.webm`,
+      video: `${process.env.API_URL}/storage/${video?.videoId}.webm`,
       createdAt: video?.createdAt,
     })) || [];
 

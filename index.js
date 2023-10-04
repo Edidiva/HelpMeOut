@@ -26,10 +26,8 @@ app.use(
   "/storage",
   express.static(path.join(__dirname, "videos_uploads"))
 );
-// app.use(
-//   "/media/files",
-  
-// );
+
+
 
 app.use(
   cors({

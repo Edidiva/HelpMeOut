@@ -27,15 +27,19 @@ agenda.define(
 
 const processVideos = async (Id) => {
   try {
+    agenda.on('complete', (job) => {
+      console.log(`Job ${job.attrs.name} completed`);
+    });
+
     await agenda.start();
     await agenda.now('process_video', {
       Id,
     });
+
     console.log('\nVIDEO PROCESSING IN BG. \n');
   } catch (error) {
     console.error(error);
-  }
-};
+  }};
 
 agenda.on('start', (job) => {
   console.log(`Job ${job.attrs.name} starting`);
