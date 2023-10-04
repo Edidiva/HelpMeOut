@@ -1,19 +1,28 @@
 const fs = require("fs");
 
-function createFile( fileName, content, destination,) {
+const path = require('path');
+
+function createFile(folderName, fileName, content) {
   try {
-    if (!fs.existsSync(destination)) {
-      console.error(`failed to create file, destination path doesn't exists.`);
-      return false;
+    const folderPath = path.join(__dirname, "..", folderName);;
+    const filePath = path.join(folderPath, fileName);
+
+    // Check if the file already exists
+    if (fs.existsSync(filePath)) {
+      throw new Error(`File "${filePath}" already exists. Cannot overwrite.`);
     }
-    const file = `${dest_path}/${fileName}`;
-    fs.writeFileSync(file, content);
-    return true;
+
+    // Create the file
+    fs.writeFileSync(filePath, content);
+    console.log(`File "${filePath}" created successfully.`);
+    return filePath;
   } catch (e) {
-    console.error(`failed to create file: ${e.message}`);
-    return false;
+    console.error(`Failed to create file: ${e.message}`);
+    return null;
   }
-}
+};
+
+
 
 function deleteFile(file) {
   if (!fs.existsSync(file)) {

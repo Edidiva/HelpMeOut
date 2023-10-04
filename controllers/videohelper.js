@@ -4,8 +4,10 @@ const { processVideos } = require("../agenda");
 const fs = require("fs");
 const path = require("path");
 const dotenv = require('dotenv');
-const { createFile, deleteFile } = require("./fileOperations");
+const { createFile } = require("./fileOperations");
 dotenv.config()
+console.log(`Current directory: ${process.cwd()}`);
+
 
 const streamVideo = async (req, res) => {
   try {
@@ -24,14 +26,9 @@ const streamVideo = async (req, res) => {
     }
 
     const fileName = `${videoId}.webm`;
-    const fileDir = `${process.cwd()}/videos_uploads`;
-    const videoPath = `${fileDir}/${fileName}`;
-
-    // create file
-    if (!fs.existsSync(videoPath)) {
-      createFile(fileDir, fileName, "");
-    }
-
+    const folderName =  `videos_uploads`;
+    const videoPath =  createFile(folderName, fileName, "");
+    console.log(videoPath)
     const videoStream = fs.createWriteStream(videoPath);
     videoStream.write(blobBuffer);
 
@@ -47,7 +44,7 @@ const streamVideo = async (req, res) => {
 
 async function endStream(req, res) {
   try {
-    const videoId = req.params["videoId"];
+    const {videoId} = req.params;
     if (typeof videoId === "undefined") {
       return res.status(400).json({ message: "video id not present?" });
     }
@@ -58,15 +55,6 @@ async function endStream(req, res) {
     if (video === null) {
       res.status(404).json({ message: "Failed to end stream, media not found." });
       return;
-    }
-
-    const fileName = `${videoId}.webm`;
-    const fileDir = process.cwd() + "/videos_uploads";
-    const videoPath = `${fileDir}/${fileName}`;
-
-    // create file
-    if (!fs.existsSync(videoPath)) {
-      createFile(fileDir, fileName, "");
     }
 
     // call the background job
@@ -104,7 +92,7 @@ async function getVideoById(req, res) {
       message: "Video fetched successfully",
       data: {
         id: videoExists.videoId,
-        videoPath: `${process.env.API_URL}/media/files/${videoExists?.videoId}.webm`,
+        videoPath: `${process.env.API_URL}/storage/${videoExists?.videoId}.webm`,
         transcript: videoExists.transcript,
         createAt: videoExists.createdAt,
         thumbnail: videoExists.thumbnail,
